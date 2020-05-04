@@ -1,13 +1,25 @@
-import React from 'react'
-import Component from 'react'
-import { Button } from '@material-ui/core'
-import { TextField } from '@material-ui/core'
-import Row from 'react-bootstrap/Row'
-import Col from 'react-bootstrap/Col'
+import React, { Component } from 'react'
+import './MyStyle.css'
+import ReactDOM from 'react-dom'
 import GoogleLogin from 'react-google-login'
 import GoogleLogout from 'react-google-login'
+import Welcome from './Welcome'
+import axios from 'axios'
+import Login from './login'
+import { Button } from '@material-ui/core'
+import { TextField } from '@material-ui/core'
+import { FormLabel  } from '@material-ui/core'
+import {InputAdornment } from '@material-ui/core'
+import {IconButton} from '@material-ui/core'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
+import Edit from "@material-ui/icons/Edit"
+import Dashboard from './Dashbord'
 
-class Signup extends React.Component{
+const API_URL ='http://localhost:8080'
+const USER_API_URL = `${API_URL}/createUser`
+
+class SignUp_old extends Component{
 
     constructor(props){
         super(props)
@@ -24,7 +36,55 @@ class Signup extends React.Component{
     
     }
 
+    renderLoginPage(){
+        
+    }
+    
+     handleLogin = (e) =>{
+        console.log("handleLogin")
+        this.setState({ existingUser :true})
+
+     }
+     handleSignUp = (e) => {
+       let axiosConfig = {
+            headers: {
+                'Content-Type': 'application/json;charset=UTF-8'
+            }
+          };
+      
+          console.log("data :",this.state.name," email :",this.state.email)
+            axios.post(USER_API_URL, {
+                "userName": this.state.name,
+                "email":this.state.email,
+                "password":this.state.password
+            },axiosConfig     
+            ).then((res) => {
+               
+                this.setState({
+                   
+                    isValidUser : true,
+                    isLoggedIn : true
+                });
+                console.log("RESPONSE RECEIVED: ", res);
+                console.log("State: ", this.state.isValidUser);
+                
+              })
+              .catch((err) => {
+                console.log("AXIOS ERROR: ", err);
+              })
+
+              
+
+       }
+       
+       componentDidMount(){
+      //   this.handleSignUp();
+     }
+
     render(){
+
+        const renderLoginPage = this.renderLoginPage();
+
         const responseGoogleSuccess = (response) => {
             this.setState(
                 {
@@ -52,7 +112,22 @@ class Signup extends React.Component{
                
            }
        }
+
+
+      
+       if( !this.state.isValidUser ) {
         return(
+            <div>
+                <header >
+                    <Row>
+                        <Col xs lg="8">
+                            <p><img id="logo" float="left" src={require("../img/logo.png")}></img><span className="logo-text">Splitwise</span></p>
+                        </Col>
+                       
+                        <Col md="auto"> Already Have an Account?<Button variant="contained" onClick={this.handleLogin}>Login</Button></Col>
+                      
+                    </Row>
+                </header>
             <div className=" pltws container-fluid">
                  <div className="row  justify-content-center align-items-center">
                     <Col xs="2">                   
@@ -119,9 +194,18 @@ class Signup extends React.Component{
                     </Col>
                 </div>
             </div>
-        
+            </div>
+            
+        )
+     }
+     else{
+        return(
+         <Welcome name={this.state.name}></Welcome>
+       
         )
     }
+
+}
 }
 
-export default Signup
+export default SignUp_old
